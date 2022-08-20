@@ -3,6 +3,8 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="almostBlack">#222222</color>
+    <color name="ripple">#333333</color>
     <color name="red">#FF0000</color>
     <color name="green">#5BB318</color>
+    <color name="greenAlpha">#7DCE13</color>
 </resources>

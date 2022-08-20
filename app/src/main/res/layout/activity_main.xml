@@ -19,7 +19,7 @@
             android:id="@+id/expressionTV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Expression"
+            android:text=""
             android:textColor="@color/green"
             android:textSize="25sp"
             android:textAlignment="textEnd"
@@ -34,7 +34,7 @@
             android:id="@+id/resultTV"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Hello World!"
+            android:text=""
             android:textColor="@color/white"
             android:textSize="40sp"
             android:textAlignment="textEnd"
@@ -53,9 +53,10 @@
             android:id="@+id/btnC"
             style="@style/buttonNumeric"
             android:text="C"
+            android:textColor="@color/green"
             />
         <Button
-            android:id="@+id/btnCE"
+            android:id="@+id/btnBackspace"
             style="@style/buttonNumeric"
             android:text="⌫"
             />
@@ -150,13 +151,9 @@
         style="@style/buttonRow"
         >
         <Button
-            android:id="@+id/btnSignal"
-            style="@style/buttonNumeric"
-            android:text="+/-"
-            />
-        <Button
             android:id="@+id/btnZero"
             style="@style/buttonNumeric"
+            android:layout_weight="2"
             android:text="0"
             />
         <Button
@@ -167,7 +164,7 @@
         <Button
             android:id="@+id/btnEqual"
             style="@style/buttonNumeric"
-            android:background="@color/green"
+            android:background="@drawable/ripple_green"
             android:text="="
             />
     </LinearLayout>
