@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
 
         for (id in numericButtonIds) {
             findViewById<Button>(id).setOnClickListener{
-                onClickNumericButton(it, expressionTV)
+                onClickNumericButton(it, expressionTV, resultTV)
             }
         }
 
@@ -99,8 +99,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun onClickNumericButton(view: View, expressionTV: TextView) {
+    private fun onClickNumericButton(view: View, expressionTV: TextView, resultTV: TextView) {
         lastCharIsDigit = true
+
+        if (resultTV.text.isNotEmpty() && expression.last().isDigit()) {
+            resultTV.text = ""
+            expression = ""
+            expressionTV.text = ""
+        }
 
         expression += (view as Button).text
         expressionTV.text = expression
@@ -113,7 +119,8 @@ class MainActivity : AppCompatActivity() {
 
         val operator = (view as Button).text
 
-        if (lastCharIsDigit || operator == "-") {
+        val addingSubtractInBegging = operator == "-" && expression.isEmpty()
+        if (lastCharIsDigit || addingSubtractInBegging) {
             expression += operator
             expressionTV.text = expression
 
@@ -123,55 +130,70 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onClickEqualButton(expressionTV: TextView, resultTV: TextView) {
-        if (containsOperator(expression) && lastCharIsDigit) {
-            calculateAndDisplayResult(expressionTV, resultTV)
-        }
+        calculateAndDisplayResult(expressionTV, resultTV)
     }
 
     private fun calculateAndDisplayResult(expressionTV: TextView, resultTV: TextView) {
-        val regexOperators = Regex("""[+|\-|×|÷]""")
-        val terms = expression.split(regexOperators)
+        val startsWithSubtract = expression.startsWith("-")
+
+        val regexOperators = Regex("""[+|\-×÷]""")
+        val terms = if (!startsWithSubtract)
+                expression.split(regexOperators).filter{ term -> term.isNotEmpty() }
+            else
+                expression.substring(1).split(regexOperators).filter{ term -> term.isNotEmpty() }
 
         if (terms.size != 2) {
             Toast.makeText(this, "Formato inválido!", Toast.LENGTH_LONG).show()
             return
         }
 
-        val firstTerm = terms[0]
-        val secondTerm = terms[1]
-        val operator = expression[firstTerm.length]
-        var result: Double
+        try {
+            val firstNumberString = if (startsWithSubtract) "-${terms[0]}" else terms[0]
+            val secondNumberString = terms[1]
+            val operator = expression[firstNumberString.length]
+            var result: Double;
 
-        when (operator) {
-            '+' -> {
-                result = firstTerm.toDouble() + secondTerm.toDouble()
+            val firstNumberDouble = firstNumberString.toDouble()
+            val secondNumberDouble = secondNumberString.toDouble()
+
+            when (operator) {
+                '+' -> {
+                    result = firstNumberDouble + secondNumberDouble
+                }
+                '-' -> {
+                    result = firstNumberDouble - secondNumberDouble
+                }
+                '×' -> {
+                    result = firstNumberDouble * secondNumberDouble
+                }
+                '÷' -> {
+                    result = firstNumberDouble / secondNumberDouble
+                }
+                else -> {
+                    return
+                }
             }
-            '-' -> {
-                result = firstTerm.toDouble() - secondTerm.toDouble()
+
+            expression = result.toString()
+
+            if (expression.endsWith(".0")) {
+                expression = expression.substring(0, expression.length - 2)
             }
-            '×' -> {
-                result = firstTerm.toDouble() * secondTerm.toDouble()
-            }
-            '÷' -> {
-                result = firstTerm.toDouble() / secondTerm.toDouble()
-            }
-            else -> {
-                return
-            }
+
+            resultTV.text = expression
+            expressionTV.text = expression
+        } catch (err: Error) {
+            Toast.makeText(this, "Erro!", Toast.LENGTH_LONG).show()
         }
-
-        expression = result.toString()
-
-        if (expression.endsWith(".0")) {
-            expression = expression.substring(0, expression.length - 2)
-        }
-
-        resultTV.text = expression
-        expressionTV.text = expression
     }
 
     private fun containsOperator(expression: String): Boolean {
+        val startsWithSubtract = expression.startsWith("-")
         val regexOperators = Regex("""[+|\-×÷]""")
-        return expression.contains(regexOperators)
+
+        return if(!startsWithSubtract)
+                expression.contains(regexOperators)
+            else
+                expression.substring(1).contains(regexOperators)
     }
 }
